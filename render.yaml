@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: kairo-api
+    runtime: node
+    rootDir: server
+    plan: free
+    healthCheckPath: /api/health
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CLIENT_ORIGIN
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      - key: NVIDIA_API_KEY
+        sync: false
+      - key: NIM_BASE_URL
+        value: https://integrate.api.nvidia.com/v1
+      - key: NIM_MODEL
+        value: meta/muse-glimmer-30b
+      - key: NIM_REASONING_EFFORT
+        value: low
+      - key: AI_SERVICE_URL
+        sync: false
+
+  - type: web
+    name: kairo-ai
+    runtime: python
+    rootDir: ai-service
+    plan: free
+    healthCheckPath: /health
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: NVIDIA_API_KEY
+        sync: false
